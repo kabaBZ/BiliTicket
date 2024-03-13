@@ -3,12 +3,11 @@ from requests.sessions import Session
 
 class BiliBrowser(object):
     def __init__(self, cookies):
-        self.cookies = cookies
         self.seession = Session()
+        self.seession.cookies = cookies
         self.ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0."
         self.headers = {
             "User-Agent": self.ua,
-            "cookie": self.cookies,
             "sec-ch-ua": '"Chromium";v="122", "Not(A:Brand";v="24", "Microsoft Edge";v="122"',
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": '"Windows"',

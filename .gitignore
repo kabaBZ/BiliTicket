@@ -4,4 +4,4 @@ Desktop.ini
 cookie.txt
 token.txt
 .buyer_info.json
-*/__pycache__
+__pycache__

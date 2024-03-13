@@ -1,1 +1,0 @@
-登录  cookie  XT_token   Ticket_ID  SKU_ID  
