@@ -6,9 +6,8 @@ from BiliOrder.BiliBrowser import BiliBrowser
 
 
 class BiliApi(object):
-    def __init__(self, cookies, token):
+    def __init__(self, cookies):
         self.seession = BiliBrowser(cookies)
-        self.token = token
         self.userid = None
         self.init_login_info()
 
