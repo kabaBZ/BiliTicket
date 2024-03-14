@@ -52,6 +52,11 @@ class BiliWorker(BaseWorker):
 
         sku_id = selected_sku["skuid"]
         price = selected_sku["price"]
+
+        input("修改buyer_info.json,保存后按回车")
+        with open("./buyer_info.json", "r", encoding="utf-8") as f:
+            buyer_info = json.loads(f.read().replace(" ", ""))
+
         bili_api.prepare(
             {
                 "project_id": project_id,
@@ -59,13 +64,12 @@ class BiliWorker(BaseWorker):
                 "sku_id": str(sku_id),
             }
         )
-        input("修改buyer_info.json,保存后按回车")
-        with open("./buyer_info.json", "r", encoding="utf-8") as f:
-            buyer_info = json.loads(f.read().replace(" ", ""))
+        buyer_list = bili_api.confirm_info("82605")
+
         buyer_id = bili_api.create_buyer(buyer_info)
         # # proid 81605  screenid 162526 skuid 461268
-        bili_api.confirm_info("82605")
-        for buyer in bili_api.buyer_list:
+
+        for buyer in buyer_list:
             if str(buyer["id"]) == buyer_id:
                 bili_api.buyer = buyer
         # while time.time() < 1709457600:
@@ -106,7 +110,7 @@ class BiliWorker(BaseWorker):
         """
         api = BiliApi(cookie)
         res = api.get_login_info()
-        if res and res['isLogin'] is True:
+        if res and res["isLogin"] is True:
             return True
         return False
 
