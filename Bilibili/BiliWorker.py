@@ -1,6 +1,6 @@
 import json
 import time
-from abc import abstractmethod
+from logging import Logger
 
 from Bilibili.BiliApi import BiliApi
 from Bilibili.BiliLogin import BiliLogin
@@ -17,14 +17,14 @@ class BiliWorker(BaseWorker):
         执行登录获取cookie
         """
         session_cookie = BiliLogin().run()
-        return session_cookie, session_cookie.get_dict()
+        return session_cookie
 
     def prepare_mission_info(self):
         """
         执行登录获取cookie
         确定购票信息
         """
-        session_cookie, cookie_dict = self.login()
+        session_cookie = self.login()
         bili_api = BiliApi(session_cookie)
         project_id = input("输入演出id(按回车结束):")  # 81605
         # 获取演出场次及票务信息
@@ -99,11 +99,16 @@ class BiliWorker(BaseWorker):
                     time.sleep(0.05)
                     continue
 
-    def cookie_is_valid(self, cookie):
+    @staticmethod
+    def cookie_is_valid(cookie):
         """
         判断cookie是否有效
         """
-        pass
+        api = BiliApi(cookie)
+        res = api.get_login_info()
+        if res and res['isLogin'] is True:
+            return True
+        return False
 
     def act(self, cookie, mission_info):
         """
@@ -113,4 +118,6 @@ class BiliWorker(BaseWorker):
         返回抢购结果
         第三方推送抢购结果信息
         """
+        if not self.cookie_is_valid(cookie):
+            return False
         pass
