@@ -137,7 +137,10 @@ class BiliApi(object):
             params=params,
             data=data,
         )
-        pass
+        res_data = response.json()
+        if res_data["code"] == 0:
+            return res_data["data"]["token"]
+        raise Exception(f"Token获取失败:{res_data['msg']}")
 
     def confirm_info(self, project_id, token):
         """

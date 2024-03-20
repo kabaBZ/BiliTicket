@@ -1,6 +1,7 @@
 import json
 import time
 from logging import Logger
+from Common.Utils import datetime_to_timestamp
 
 from Bilibili.BiliApi import BiliApi
 from Bilibili.BiliLogin import BiliLogin
@@ -19,12 +20,14 @@ class BiliWorker(BaseWorker):
         session_cookie = BiliLogin().run()
         return session_cookie
 
-    def prepare_mission_info(self):
+    def prepare_mission_info(self, session_cookie=None):
         """
-        执行登录获取cookie
+        执行登录获取cookie(传入cookie时不进行登录)
+
         确定购票信息
         """
-        session_cookie = self.login()
+        if not session_cookie:
+            session_cookie = self.login()
         bili_api = BiliApi(session_cookie)
         project_id = input("输入演出id(按回车结束):")  # 81605
         # 获取演出场次及票务信息
@@ -36,44 +39,46 @@ class BiliWorker(BaseWorker):
             print("已选择第一场次")
             selected_screen = screenlist[0]
         else:
-            selected_screen = screenlist[input("请选择场次编号：") - 1]
+            selected_screen = screenlist[int(input("请选择场次编号：")) - 1]
 
-        screenid = selected_screen["screen_id"]
+        screen_id = selected_screen["screen_id"]
 
         print(f"本场次共{len(screenlist)}票种")
         sku_list = selected_screen["sku_list"]
         for sku in sku_list:
-            print(f"票种编号：{sku_list.index(sku) + 1}  票种名称：{sku['skuid']}")
+            print(
+                f"票种编号：{sku_list.index(sku) + 1}  票种名称：{sku['name']} - ￥{sku['price']/100}  票种SKUid：{sku['skuid']}"
+            )
         if len(sku_list) == 1:
             print("已选择第一票种")
             selected_sku = sku_list[0]
         else:
-            selected_sku = sku_list[input("请选择票种编号：") - 1]
+            selected_sku = sku_list[int(input("请选择票种编号：")) - 1]
 
         sku_id = selected_sku["skuid"]
+        start_time = selected_screen["startTime"]
         price = selected_sku["price"]
 
         input("修改buyer_info.json,保存后按回车")
         with open("./buyer_info.json", "r", encoding="utf-8") as f:
             buyer_info = json.loads(f.read().replace(" ", ""))
 
-        bili_api.prepare(
+        token = bili_api.prepare(
             {
                 "project_id": project_id,
-                "screen_id": str(screenid),
+                "screen_id": str(screen_id),
                 "sku_id": str(sku_id),
             }
         )
-        buyer_list = bili_api.confirm_info("82605")
+        buyer_list = bili_api.confirm_info("82605", token)
 
         buyer_id = bili_api.create_buyer(buyer_info)
-        # # proid 81605  screenid 162526 skuid 461268
 
         for buyer in buyer_list:
             if str(buyer["id"]) == buyer_id:
                 bili_api.buyer = buyer
-        # while time.time() < 1709457600:
-        while time.time() < 1709459998:
+        start_time_stamp = datetime_to_timestamp(start_time)
+        while time.time() < start_time_stamp:
             print("等待抢购")
             time.sleep(0.5)
         while True:
@@ -81,14 +86,17 @@ class BiliWorker(BaseWorker):
                 result = bili_api.createV2(
                     {
                         "projectid": project_id,
-                        "screenid": str(screenid),
+                        "screenid": str(screen_id),
                         "skuid": str(sku_id),
                         "price": str(price),
                     },
                     bili_api.buyer,
+                    token,
                 )
             except Exception as e:
                 print(f"报错：{e}")
+                if time.time() > 1709460050:
+                    break
                 time.sleep(0.05)
                 continue
             else:
