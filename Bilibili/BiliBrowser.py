@@ -21,6 +21,11 @@ class BiliBrowser(object):
             "pragma": "no-cache",
         }
 
+    def get_cookie_str(self):
+        return ";".join(
+            [f"{key}={value}" for key, value in self.seession.cookies.items()]
+        )
+
     def getRequest(self, url: str, data: dict = {}, params: dict = {}) -> str:
         self.seession.headers = self.headers
         response = self.seession.get(url, params=params, data=data)

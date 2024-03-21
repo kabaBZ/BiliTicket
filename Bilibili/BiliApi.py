@@ -162,30 +162,32 @@ class BiliApi(object):
             "https://show.bilibili.com/api/ticket/order/confirmInfo", params=params
         )
         res = self.parse_response(response)
-        self.buyer_list = res["buyerList"]["list"]
+        self.buyer_list = (res["buyerList"] or {}).get("list", [])
         return self.buyer_list
 
     def createV2(self, tikect_info, buyer_Info, token):
         """
         创建订单
         """
-        encoded_deviceId = re.findall("buvid3=(.*?); b_nut", self.seession.cookies)[0]
+        # encoded_deviceId = re.findall(
+        #     "buvid3=(.*?); b_nut", self.seession.get_cookie_str()
+        # )[0]
 
-        if "feSign" in self.seession.cookies:
-            decoded_deviceId = re.findall(
-                "feSign=(.*?); payParams", self.seession.cookies
-            )[0]
-        else:
-            decoded_deviceId = re.findall(
-                "deviceFingerprint=(.*?); from", self.seession.cookies
-            )[0]
+        # if "feSign" in self.seession.get_cookie_str():
+        #     decoded_deviceId = re.findall(
+        #         "feSign=(.*?); payParams", self.seession.get_cookie_str()
+        #     )[0]
+        # else:
+        #     decoded_deviceId = re.findall(
+        #         "deviceFingerprint=(.*?); from", self.seession.get_cookie_str()
+        #     )[0]
 
         self.seession.headers.update(
             {
                 "authority": "show.bilibili.com",
                 "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
                 "content-type": "application/x-www-form-urlencoded",
-                "x-risk-header": f"platform/pc uid/{self.userid} deviceId/{encoded_deviceId}",
+                "x-risk-header": f"platform/pc uid/{self.userid} deviceId/",  # deviceId/{encoded_deviceId}
             }
         )
         params = {
@@ -204,7 +206,7 @@ class BiliApi(object):
             "buyer_info": json.dumps([buyer_Info], separators=(",", ":")),
             "token": token,
             # todo 将deviceId换成从cookie中取deviceFingerprint
-            "deviceId": decoded_deviceId,
+            "deviceId": "",  # decoded_deviceId
             "clickPosition": f'{{"x":1337,"y":364,"origin":{origin},"now":{timestamp}}}',
             "newRisk": "true",
             "requestSource": "pc-new",

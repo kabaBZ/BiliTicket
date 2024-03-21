@@ -56,7 +56,7 @@ class BiliWorker(BaseWorker):
             selected_sku = sku_list[int(input("请选择票种编号：")) - 1]
 
         sku_id = selected_sku["skuid"]
-        start_time = selected_screen["startTime"]
+        start_time = selected_sku["startTime"]
         price = selected_sku["price"]
 
         input("修改buyer_info.json,保存后按回车")
@@ -70,14 +70,14 @@ class BiliWorker(BaseWorker):
                 "sku_id": str(sku_id),
             }
         )
-        buyer_list = bili_api.confirm_info("82605", token)
-
         buyer_id = bili_api.create_buyer(buyer_info)
+        buyer_list = bili_api.confirm_info(project_id, token)
 
         for buyer in buyer_list:
             if str(buyer["id"]) == buyer_id:
                 bili_api.buyer = buyer
         start_time_stamp = datetime_to_timestamp(start_time)
+        stop_time_stamp = start_time_stamp + 80
         while time.time() < start_time_stamp:
             print("等待抢购")
             time.sleep(0.5)
@@ -95,7 +95,8 @@ class BiliWorker(BaseWorker):
                 )
             except Exception as e:
                 print(f"报错：{e}")
-                if time.time() > 1709460050:
+                if time.time() > stop_time_stamp:
+                    print("时间到")
                     break
                 time.sleep(0.05)
                 continue
@@ -106,7 +107,8 @@ class BiliWorker(BaseWorker):
                     break
                 else:
                     print(result)
-                    if time.time() > 1709460050:
+                    if time.time() > stop_time_stamp:
+                        print("时间到")
                         break
                     time.sleep(0.05)
                     continue
