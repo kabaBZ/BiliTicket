@@ -54,9 +54,8 @@ class BiliApi(object):
         )
         res = self.parse_response(res)
         if res:
-            self.buyerid = res["id"]
             print("创建购买人成功")
-            return self.buyerid
+            return res["id"]
 
     def get_login_info(self):
         self.seession.headers.update(
@@ -116,6 +115,16 @@ class BiliApi(object):
 
         return screen_list
 
+    def get_added_buyer_list(self):
+        """
+        获取已添加的购买信息
+        """
+        response = self.seession.getRequest(
+            "https://show.bilibili.com/api/ticket/buyer/list"
+        )
+        res = self.parse_response(response)
+        return res.get("list", []) or []
+
     def prepare(self, ticket_info):
         """
         获取订单页面token
@@ -136,6 +145,7 @@ class BiliApi(object):
             "https://show.bilibili.com/api/ticket/order/prepare",
             params=params,
             data=data,
+            time_out=1,
         )
         res_data = response.json()
         if res_data["code"] == 0:
