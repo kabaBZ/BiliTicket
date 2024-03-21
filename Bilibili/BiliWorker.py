@@ -71,7 +71,7 @@ class BiliWorker(BaseWorker):
             }
         )
         buyer_id = bili_api.create_buyer(buyer_info)
-        buyer_list = bili_api.confirm_info(project_id, token)
+        buyer_list = bili_api.confirm_info("81422", token)
 
         for buyer in buyer_list:
             if str(buyer["id"]) == buyer_id:
