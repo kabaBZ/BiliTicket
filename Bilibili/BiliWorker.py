@@ -160,7 +160,7 @@ class BiliWorker(BaseWorker):
                 if time.time() > stop_time_stamp:
                     print("时间到")
                     break
-                time.sleep(0.05)
+                time.sleep(0.1)
                 continue
             else:
                 if result:
@@ -172,7 +172,7 @@ class BiliWorker(BaseWorker):
                     if time.time() > stop_time_stamp:
                         print("时间到")
                         break
-                    time.sleep(0.05)
+                    time.sleep(0.1)
                     continue
 
     @staticmethod
