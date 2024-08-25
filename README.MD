@@ -35,3 +35,7 @@
 - 优化参数输入的方式(改为config.toml)
 - 增加更多种配置方式
 - 支持任务队列/多任务定时器抢票
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=kabaBZ/BiliTicket&type=Date)](https://star-history.com/#kabaBZ/BiliTicket/&Date)
