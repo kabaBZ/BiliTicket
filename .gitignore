@@ -1,0 +1,11 @@
+/venv
+Desktop.ini
+.vscode
+cookie.txt
+token.txt
+.buyer_info.json
+__pycache__
+session_cookie
+buyer_info.json
+buyer_info_bak.json
+buyer_info_bak_bak.json

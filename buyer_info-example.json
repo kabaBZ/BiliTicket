@@ -1,0 +1,8 @@
+{
+    "name": "<姓名>",
+    "tel": "<手机号>",
+    "id_type": "0",
+    "personal_id": "<身份证号>",
+    "is_default": "0",
+    "src": "ticket"
+}
